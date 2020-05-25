@@ -1,0 +1,43 @@
+.twott-item {
+  margin: 1rem 0;
+}
+
+.twott-item__content {
+  padding: 0;
+}
+
+.twott-item__info {
+  padding: 1rem;
+  text-align: center;
+}
+
+.twott-item__info h2,
+.twott-item__info h3,
+.twott-item__info p {
+  margin: 0 0 0.5rem 0;
+}
+
+.twott-item__actions {
+  padding: 1rem;
+  text-align: center;
+  border-top: 1px solid #ccc;
+}
+
+.twott-item__modal-content {
+  padding: 0;
+}
+
+.twott-item__modal-actions {
+  text-align: right;
+}
+
+.twott-item__actions button,
+.twott-item__actions a {
+  margin: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .twott-item__image {
+    height: 20rem;
+  }
+}

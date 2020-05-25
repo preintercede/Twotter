@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import Users from "./user/pages/Users";
 import NewTwott from "./twotts/pages/NewTwott";
+import UserTwotts from "./twotts/pages/UserTwotts";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
 
 const App = () => {
@@ -17,6 +18,9 @@ const App = () => {
         <Switch>
           <Route path="/" exact>
             <Users />
+          </Route>
+          <Route path="/:userId/twotts" exact>
+            <UserTwotts />
           </Route>
           <Route path="/twotts/new" exact>
             <NewTwott />
