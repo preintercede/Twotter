@@ -17,6 +17,7 @@ const UsersList = (props) => {
         <UserItem
           key={user.id}
           id={user.id}
+          image={user.image}
           name={user.name}
           twottsCount={user.twotts}
         />
