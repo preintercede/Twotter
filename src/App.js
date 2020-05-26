@@ -10,6 +10,7 @@ import NewTwott from "./twotts/pages/NewTwott";
 import UserTwotts from "./twotts/pages/UserTwotts";
 import UpdateTwott from "./twotts/pages/UpdateTwott";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
+import Auth from "./user/pages/Auth";
 
 const App = () => {
   return (
@@ -28,6 +29,9 @@ const App = () => {
           </Route>
           <Route path="/twotts/:twottId">
             <UpdateTwott />
+          </Route>
+          <Route path="/auth">
+            <Auth />
           </Route>
           <Redirect to="/" />
         </Switch>
