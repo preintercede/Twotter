@@ -8,6 +8,7 @@ import {
 import Users from "./user/pages/Users";
 import NewTwott from "./twotts/pages/NewTwott";
 import UserTwotts from "./twotts/pages/UserTwotts";
+import UpdateTwott from "./twotts/pages/UpdateTwott";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
 
 const App = () => {
@@ -24,6 +25,9 @@ const App = () => {
           </Route>
           <Route path="/twotts/new" exact>
             <NewTwott />
+          </Route>
+          <Route path="/twotts/:twottId">
+            <UpdateTwott />
           </Route>
           <Redirect to="/" />
         </Switch>
