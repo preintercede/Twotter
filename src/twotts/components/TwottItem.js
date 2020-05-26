@@ -1,22 +1,60 @@
-import React from "react";
+import React, { useState } from "react";
 import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/FormElements/Button";
+import Modal from "../../shared/components/UIElements/Modal";
 import "./TwottItem.css";
 
 const TwottItem = (props) => {
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const showDeleteWarningHandler = () => {
+    setShowConfirmModal(true);
+  };
+
+  const cancelDeleteHandler = () => {
+    setShowConfirmModal(false);
+  };
+
+  const confirmDeleteHandler = () => {
+    setShowConfirmModal(false);
+    console.log("Deleted");
+  };
+
   return (
-    <li className="twott-item">
-      <Card className="twott-item__content">
-        <div className="twott-item__info">
-          <h2>{props.title}</h2>
-          <h3>{props.description}</h3>
-        </div>
-        <div className="twott-item__actions">
-          <Button to={`/twotts/${props.id}`}>EDIT</Button>
-          <Button danger>DELETE</Button>
-        </div>
-      </Card>
-    </li>
+    <>
+      <Modal
+        show={showConfirmModal}
+        onCancel={cancelDeleteHandler}
+        header="Are you sure?"
+        footerClass="place-item__modal-actions"
+        footer={
+          <>
+            <Button inverse onClick={cancelDeleteHandler}>
+              CANCEL
+            </Button>
+            <Button danger onClick={confirmDeleteHandler}>
+              DELETE
+            </Button>
+          </>
+        }
+      >
+        <p>Do you want to delete this twott?</p>
+      </Modal>
+      <li className="twott-item">
+        <Card className="twott-item__content">
+          <div className="twott-item__info">
+            <h2>{props.title}</h2>
+            <h3>{props.description}</h3>
+          </div>
+          <div className="twott-item__actions">
+            <Button to={`/twotts/${props.id}`}>EDIT</Button>
+            <Button danger onClick={showDeleteWarningHandler}>
+              DELETE
+            </Button>
+          </div>
+        </Card>
+      </li>
+    </>
   );
 };
 

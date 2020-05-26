@@ -1,6 +1,8 @@
 import React from "react";
 import Card from "../../shared/components/UIElements/Card";
 import TwottItem from "./TwottItem";
+
+import Button from "../../shared/components/FormElements/Button";
 import "./TwottList.css";
 
 const TwottList = (props) => {
@@ -9,7 +11,7 @@ const TwottList = (props) => {
       <div className="twott-list center">
         <Card>
           <h2>No Twotts found.</h2>
-          <button>Share Twott</button>
+          <Button to="/twotts/new">Share Twott</Button>
         </Card>
       </div>
     );

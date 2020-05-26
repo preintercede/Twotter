@@ -11,7 +11,7 @@ const FAKE_TWOTTS = [
   },
   {
     id: "p2",
-    title: "What I did today",
+    title: "What I did yesterday",
     description: "Sleep",
     creator: "user2",
   },
