@@ -1,5 +1,6 @@
 const HttpError = require("../models/http-error");
-var uuid = require("uuid");
+const { validationResult } = require("express-validator");
+const uuid = require("uuid");
 let FAKE_TWOTTS = [
   {
     id: "user1",
@@ -38,6 +39,10 @@ const getTwottsByUserId = (req, res, next) => {
 };
 
 const createTwott = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new HttpError("Invalid input passed", 422);
+  }
   const { title, description, creator } = req.body;
   const createdTwott = {
     id: uuid.v4(),
@@ -51,6 +56,10 @@ const createTwott = (req, res, next) => {
 };
 
 const updateTwott = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new HttpError("Invalid input passed", 422);
+  }
   const { title, description } = req.body;
   const twottId = req.params.tid;
   const updatedTwott = { ...FAKE_TWOTTS.find((t) => t.id === twottId) };
@@ -65,6 +74,9 @@ const updateTwott = (req, res, next) => {
 
 const deleteTwott = (req, res, next) => {
   const twottId = req.params.tid;
+  if (!FAKE_TWOTTS.find((t) => t.id === twottId)) {
+    throw new HttpError("Could not find place for that id", 404);
+  }
   FAKE_TWOTTS = FAKE_TWOTTS.filter((t) => t.id !== twottId);
   res.status(200).json({ message: "Deleted place" });
 };

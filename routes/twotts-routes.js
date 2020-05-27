@@ -1,4 +1,5 @@
 const express = require("express");
+const { check } = require("express-validator");
 const twottsControllers = require("../controllers/twotts-controllers");
 
 const router = express.Router();
@@ -7,9 +8,17 @@ router.get("/:tid", twottsControllers.getTwottById);
 
 router.get("/user/:uid", twottsControllers.getTwottsByUserId);
 
-router.post("/", twottsControllers.createTwott);
+router.post(
+  "/",
+  [check("title").not().isEmpty(), check("description").isLength({ min: 1 })],
+  twottsControllers.createTwott
+);
 
-router.put("/:tid", twottsControllers.updateTwott);
+router.put(
+  "/:tid",
+  [check("title").not().isEmpty(), check("description").isLength({ min: 1 })],
+  twottsControllers.updateTwott
+);
 
 router.delete("/:tid", twottsControllers.deleteTwott);
 
