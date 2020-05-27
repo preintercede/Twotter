@@ -16,6 +16,14 @@ app.use(express.static(path.join(__dirname, "build")));
 
 app.use("/api/twotts", twottsRoutes);
 
+app.use((error, req, res, next) => {
+  if (res.headerSent) {
+    return next(error);
+  }
+  res.status(error.code || 500);
+  res.json({ message: error.message || "An unknown error has occured!" });
+});
+
 app.get("/*", function (req, res) {
   res.sendFile(path.join(__dirname, "build", "index.html"));
 });
