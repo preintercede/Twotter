@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get("/:tid", twottsControllers.getTwottById);
 
-router.get("/user/:uid", twottsControllers.getTwottByUserId);
+router.get("/user/:uid", twottsControllers.getTwottsByUserId);
 
 router.post("/", twottsControllers.createTwott);
 

@@ -22,19 +22,19 @@ const getTwottById = (req, res, next) => {
   res.json({ twott });
 };
 
-const getTwottByUserId = (req, res, next) => {
+const getTwottsByUserId = (req, res, next) => {
   const userId = req.params.uid;
-  const twott = FAKE_TWOTTS.find((t) => {
+  const twotts = FAKE_TWOTTS.filter((t) => {
     return t.creator === userId;
   });
 
-  if (!twott) {
+  if (!twotts || twotts.length === 0) {
     return next(
-      new HttpError("Could not find a twott for the provided user id", 404)
+      new HttpError("Could not find twotts for the provided user id", 404)
     );
   }
 
-  res.json({ twott });
+  res.json({ twotts });
 };
 
 const createTwott = (req, res, next) => {
@@ -70,7 +70,7 @@ const deleteTwott = (req, res, next) => {
 };
 
 exports.getTwottById = getTwottById;
-exports.getTwottByUserId = getTwottByUserId;
+exports.getTwottsByUserId = getTwottsByUserId;
 exports.createTwott = createTwott;
 exports.updateTwott = updateTwott;
 exports.deleteTwott = deleteTwott;
