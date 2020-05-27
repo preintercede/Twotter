@@ -5,6 +5,7 @@ const logger = require("morgan");
 const bodyParser = require("body-parser");
 
 const twottsRoutes = require("./routes/twotts-routes");
+const HttpError = require("./models/http-error");
 
 const app = express();
 
@@ -14,7 +15,14 @@ app.use(express.json());
 app.use(favicon(path.join(__dirname, "build", "favicon.ico")));
 app.use(express.static(path.join(__dirname, "build")));
 
+app.use(bodyParser.json());
+
 app.use("/api/twotts", twottsRoutes);
+
+app.use((req, res, next) => {
+  const error = new HttpError("Could not find this route", 404);
+  throw error;
+});
 
 app.use((error, req, res, next) => {
   if (res.headerSent) {
