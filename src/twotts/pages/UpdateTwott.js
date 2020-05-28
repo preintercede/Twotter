@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState, useContext } from "react";
+import { useParams, useHistory } from "react-router-dom";
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
 import {
@@ -7,28 +7,20 @@ import {
   VALIDATOR_MINLENGTH,
 } from "../../shared/util/validators";
 import "./TwottForm.css";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import { useHttpClient } from "../../shared/hooks/http-hook";
 import { useForm } from "../../shared/hooks/form-hook";
 import Card from "../../shared/components/UIElements/Card";
-
-const FAKE_TWOTTS = [
-  {
-    id: "p1",
-    title: "What I did today",
-    description: "Code",
-    creator: "user1",
-  },
-  {
-    id: "p2",
-    title: "What I did yesterday",
-    description: "Sleep",
-    creator: "user2",
-  },
-];
+import { AuthContext } from "../../shared/context/auth-context";
 
 const UpdateTwott = (props) => {
-  const [isLoading, setIsLoading] = useState(true);
+  const auth = useContext(AuthContext);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const [loadedTwott, setLoadedTwott] = useState();
   const twottId = useParams().twottId;
-  //   const identifiedTwott = FAKE_TWOTTS.find((t) => t.id === twottId);
+  const history = useHistory();
+
   const [formState, inputHandler, setFormData] = useForm(
     {
       title: {
@@ -43,33 +35,50 @@ const UpdateTwott = (props) => {
     false
   );
 
-  const identifiedTwott = FAKE_TWOTTS.find((t) => t.id === twottId);
-
   useEffect(() => {
-    if (identifiedTwott) {
-      setFormData(
-        {
-          title: {
-            value: identifiedTwott.title,
-            isValid: true,
+    const fetchTwott = async () => {
+      try {
+        const responseData = await sendRequest(
+          `http://localhost:3001/api/twotts/${twottId}`
+        );
+        setLoadedTwott(responseData.twott);
+        setFormData(
+          {
+            title: {
+              value: responseData.twott.title,
+              isValid: true,
+            },
+            description: {
+              value: responseData.twott.description,
+              isValid: true,
+            },
           },
-          description: {
-            value: identifiedTwott.description,
-            isValid: true,
-          },
-        },
-        true
-      );
-    }
-    setIsLoading(false);
-  }, [setFormData, identifiedTwott]);
+          true
+        );
+      } catch (err) {}
+    };
+    fetchTwott();
+  }, [sendRequest, twottId, setFormData]);
 
-  const twottUpdateSubmitHandler = (event) => {
+  const twottUpdateSubmitHandler = async (event) => {
     event.preventDefault();
-    console.log(formState.inputs);
+    try {
+      await sendRequest(
+        `http://localhost:3001/api/twotts/${twottId}`,
+        "PUT",
+        JSON.stringify({
+          title: formState.inputs.title.value,
+          description: formState.inputs.description.value,
+        }),
+        {
+          "Content-Type": "application/json",
+        }
+      );
+      history.push("/" + auth.userId + "/twotts");
+    } catch (err) {}
   };
 
-  if (!identifiedTwott) {
+  if (!loadedTwott && !error) {
     return (
       <div className="center">
         <Card>
@@ -82,38 +91,41 @@ const UpdateTwott = (props) => {
   if (isLoading) {
     return (
       <div className="center">
-        <h2>Loading...</h2>
+        <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    <form className="twott-form" onSubmit={twottUpdateSubmitHandler}>
-      <Input
-        id="title"
-        element="input"
-        type="text"
-        label="Title"
-        validators={[VALIDATOR_REQUIRE()]}
-        errorText="Please enter a title"
-        onInput={inputHandler}
-        initialValue={formState.inputs.title.value}
-        initialValid={formState.inputs.title.isValid}
-      />
-      <Input
-        id="description"
-        element="textarea"
-        label="Description"
-        validators={[VALIDATOR_MINLENGTH(1)]}
-        errorText="Please enter a description"
-        onInput={inputHandler}
-        initialValue={formState.inputs.description.value}
-        initialValid={formState.inputs.description.isValid}
-      />
-      <Button type="submit" disabled={!formState.isValid}>
-        UPDATE TWOTT
-      </Button>
-    </form>
+    <>
+      <ErrorModal error={error} onClear={clearError} />
+      <form className="twott-form" onSubmit={twottUpdateSubmitHandler}>
+        <Input
+          id="title"
+          element="input"
+          type="text"
+          label="Title"
+          validators={[VALIDATOR_REQUIRE()]}
+          errorText="Please enter a title"
+          onInput={inputHandler}
+          initialValue={loadedTwott.title}
+          initialValid={true}
+        />
+        <Input
+          id="description"
+          element="textarea"
+          label="Description"
+          validators={[VALIDATOR_MINLENGTH(1)]}
+          errorText="Please enter a description"
+          onInput={inputHandler}
+          initialValue={loadedTwott.description}
+          initialValid={true}
+        />
+        <Button type="submit" disabled={!formState.isValid}>
+          UPDATE TWOTT
+        </Button>
+      </form>
+    </>
   );
 };
 
