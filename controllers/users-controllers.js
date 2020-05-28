@@ -1,6 +1,7 @@
 const uuid = require("uuid");
 const { validationResult } = require("express-validator");
 const HttpError = require("../models/http-error");
+const User = require("../models/user");
 
 const FAKE_USERS = [
   {
@@ -11,42 +12,68 @@ const FAKE_USERS = [
   },
 ];
 
-const getUsers = (req, res, next) => {
+const getUsers = async (req, res, next) => {
   res.json({ users: FAKE_USERS });
 };
 
-const signup = (req, res, next) => {
+const signup = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors);
-    throw new HttpError("Invalid input passed", 422);
+    return next(new HttpError("Invalid input, please check your data", 422));
   }
-  const { name, email, password } = req.body;
+  const { name, email, password, twotts } = req.body;
 
-  const hasUser = FAKE_USERS.find((u) => u.email === email);
-  if (hasUser) {
-    throw new HttpError("Email already exists", 422);
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (err) {
+    const error = new HttpError("Signup failed. Please try again later.", 500);
+    return next(error);
   }
 
-  const createdUser = {
-    id: uuid.v4(),
+  if (existingUser) {
+    const error = new HttpError(
+      "User exists already, please login instead",
+      422
+    );
+    return next(error);
+  }
+
+  const createdUser = new User({
     name,
     email,
+    image:
+      "https://www.creativefreedom.co.uk/wp-content/uploads/2017/06/Twitter-featured.png",
     password,
-  };
+    twotts,
+  });
 
-  FAKE_USERS.push(createdUser);
+  try {
+    await createdUser.save();
+  } catch (err) {
+    const error = new HttpError("Signup failed, please try again.", 500);
+    return next(error);
+  }
 
-  res.status(201).json({ user: createdUser });
+  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
 };
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  const identifiedUser = FAKE_USERS.find((u) => u.email === email);
-  if (!identifiedUser || identifiedUser.password !== password) {
-    throw new HttpError("Invalid credentials", 401);
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (err) {
+    const error = new HttpError("Login failed. Please try again later.", 500);
+    return next(error);
   }
+
+  if (!existingUser || existingUser.password !== password) {
+    const error = new HttpError("Invalid credentials", 401);
+    return next(error);
+  }
+
   res.json({ message: "Logged In" });
 };
 

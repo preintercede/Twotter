@@ -88,7 +88,7 @@ const createTwott = async (req, res, next) => {
 const updateTwott = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new HttpError("Invalid input passed", 422);
+    return next(new HttpError("Invalid input passed", 422));
   }
 
   const { title, description } = req.body;
