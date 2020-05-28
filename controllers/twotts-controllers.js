@@ -1,6 +1,6 @@
 const HttpError = require("../models/http-error");
 const { validationResult } = require("express-validator");
-const uuid = require("uuid");
+const Twott = require("../models/twott");
 let FAKE_TWOTTS = [
   {
     id: "user1",
@@ -10,24 +10,45 @@ let FAKE_TWOTTS = [
   },
 ];
 
-const getTwottById = (req, res, next) => {
+const getTwottById = async (req, res, next) => {
   const twottId = req.params.tid;
-  const twott = FAKE_TWOTTS.find((t) => {
-    return t.id === twottId;
-  });
+  let twott;
 
-  if (!twott) {
-    throw new HttpError("Could not find a twott for the provided id", 404);
+  try {
+    twott = await Twott.findById(twottId);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong. Could not find twott",
+      500
+    );
+    return next(error);
   }
 
-  res.json({ twott });
+  if (!twott) {
+    const error = new HttpError(
+      "Could not find a twott for the provided id",
+      404
+    );
+    return next(error);
+  }
+
+  res.json({ twott: twott.toObject({ getters: true }) });
 };
 
-const getTwottsByUserId = (req, res, next) => {
+const getTwottsByUserId = async (req, res, next) => {
   const userId = req.params.uid;
-  const twotts = FAKE_TWOTTS.filter((t) => {
-    return t.creator === userId;
-  });
+
+  let twotts;
+
+  try {
+    twotts = await Twott.find({ creator: userId });
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching twotts failed, please try again",
+      500
+    );
+    return next(error);
+  }
 
   if (!twotts || twotts.length === 0) {
     return next(
@@ -35,23 +56,32 @@ const getTwottsByUserId = (req, res, next) => {
     );
   }
 
-  res.json({ twotts });
+  res.json({
+    twotts: twotts.map((twott) => twott.toObject({ getters: true })),
+  });
 };
 
-const createTwott = (req, res, next) => {
+const createTwott = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new HttpError("Invalid input passed", 422);
   }
   const { title, description, creator } = req.body;
-  const createdTwott = {
-    id: uuid.v4(),
+  const createdTwott = new Twott({
     title,
     description,
     creator,
-  };
+  });
+  try {
+    await createdTwott.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Could not create twott failed, please try again.",
+      500
+    );
+    return next(error);
+  }
 
-  FAKE_TWOTTS.push(createdTwott);
   res.status(201).json({ twott: createdTwott });
 };
 
