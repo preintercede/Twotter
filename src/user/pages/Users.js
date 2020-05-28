@@ -1,18 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import UsersList from "../components/UsersList";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import { useHttpClient } from "../../shared/hooks/http-hook";
 
 const Users = () => {
-  // const USERS = [];
-  const USERS = [
-    {
-      id: "user1",
-      name: "John Doe",
-      image:
-        "https://p7.hiclipart.com/preview/609/846/439/discord-computer-icons-logo-computer-software-avatar.jpg",
-      twotts: 3,
-    },
-  ];
-  return <UsersList items={USERS} />;
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const [loadedUsers, setLoadedUsers] = useState();
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const responseData = await sendRequest(
+          "http://localhost:3001/api/users"
+        );
+
+        setLoadedUsers(responseData.users);
+      } catch (err) {}
+    };
+    fetchUsers();
+  }, [sendRequest]);
+
+  return (
+    <>
+      <ErrorModal err={error} onClear={clearError} />
+      {isLoading && (
+        <div className="center">
+          <LoadingSpinner />
+        </div>
+      )}
+      {!isLoading && loadedUsers && <UsersList items={loadedUsers} />}
+    </>
+  );
 };
 
 export default Users;
