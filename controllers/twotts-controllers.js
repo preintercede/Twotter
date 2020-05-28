@@ -85,29 +85,64 @@ const createTwott = async (req, res, next) => {
   res.status(201).json({ twott: createdTwott });
 };
 
-const updateTwott = (req, res, next) => {
+const updateTwott = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new HttpError("Invalid input passed", 422);
   }
+
   const { title, description } = req.body;
   const twottId = req.params.tid;
-  const updatedTwott = { ...FAKE_TWOTTS.find((t) => t.id === twottId) };
-  const twottIndex = FAKE_TWOTTS.findIndex((t) => t.id === twottId);
-  updatedTwott.title = title;
-  updatedTwott.description = description;
 
-  FAKE_TWOTTS[twottIndex] = updatedTwott;
+  let twott;
+  try {
+    twott = await Twott.findById(twottId);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update twott",
+      500
+    );
+    return next(error);
+  }
 
-  res.status(200).json({ twott: updatedTwott });
+  twott.title = title;
+  twott.description = description;
+
+  try {
+    await twott.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update twott",
+      500
+    );
+    return next(error);
+  }
+
+  res.status(200).json({ twott: twott.toObject({ getters: true }) });
 };
 
-const deleteTwott = (req, res, next) => {
+const deleteTwott = async (req, res, next) => {
   const twottId = req.params.tid;
-  if (!FAKE_TWOTTS.find((t) => t.id === twottId)) {
-    throw new HttpError("Could not find place for that id", 404);
+  let twott;
+  try {
+    twott = await Twott.findById(twottId);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not delete twott",
+      500
+    );
+    return next(error);
   }
-  FAKE_TWOTTS = FAKE_TWOTTS.filter((t) => t.id !== twottId);
+
+  try {
+    await twott.remove();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not delete twott",
+      500
+    );
+    return next(error);
+  }
   res.status(200).json({ message: "Deleted place" });
 };
 
