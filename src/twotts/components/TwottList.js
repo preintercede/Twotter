@@ -26,6 +26,7 @@ const TwottList = (props) => {
           title={twott.title}
           description={twott.description}
           creatorId={twott.creator}
+          onDelete={props.onDeleteTwott}
         />
       ))}
     </ul>

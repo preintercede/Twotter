@@ -3,9 +3,13 @@ import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/FormElements/Button";
 import Modal from "../../shared/components/UIElements/Modal";
 import { AuthContext } from "../../shared/context/auth-context";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import { useHttpClient } from "../../shared/hooks/http-hook";
 import "./TwottItem.css";
 
 const TwottItem = (props) => {
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const auth = useContext(AuthContext);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -17,13 +21,20 @@ const TwottItem = (props) => {
     setShowConfirmModal(false);
   };
 
-  const confirmDeleteHandler = () => {
+  const confirmDeleteHandler = async () => {
     setShowConfirmModal(false);
-    console.log("Deleted");
+    try {
+      await sendRequest(
+        `http://localhost:3001/api/twotts/${props.id}`,
+        "DELETE"
+      );
+      props.onDelete(props.id);
+    } catch (err) {}
   };
 
   return (
     <>
+      <ErrorModal error={error} onClear={clearError} />
       <Modal
         show={showConfirmModal}
         onCancel={cancelDeleteHandler}
@@ -44,6 +55,7 @@ const TwottItem = (props) => {
       </Modal>
       <li className="twott-item">
         <Card className="twott-item__content">
+          {isLoading && <LoadingSpinner asOverlay />}
           <div className="twott-item__info">
             <h2>{props.title}</h2>
             <h3>{props.description}</h3>

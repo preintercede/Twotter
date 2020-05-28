@@ -24,6 +24,12 @@ const UserTwotts = () => {
     fetchTwotts();
   }, [sendRequest, userId]);
 
+  const twottDeletedHandler = (deletedTwottId) => {
+    setLoadedTwotts((prevTwotts) =>
+      prevTwotts.filter((twott) => twott.id !== deletedTwottId)
+    );
+  };
+
   return (
     <>
       <ErrorModal error={error} onClear={clearError} />
@@ -32,7 +38,9 @@ const UserTwotts = () => {
           <LoadingSpinner />
         </div>
       )}
-      {!isLoading && loadedTwotts && <TwottList items={loadedTwotts} />}
+      {!isLoading && loadedTwotts && (
+        <TwottList items={loadedTwotts} onDeleteTwott={twottDeletedHandler} />
+      )}
     </>
   );
 };
