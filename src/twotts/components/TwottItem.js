@@ -61,11 +61,11 @@ const TwottItem = (props) => {
             <h3>{props.description}</h3>
           </div>
           <div className="twott-item__actions">
-            {auth.isLoggedIn && (
+            {auth.userId === props.creatorId && (
               <Button to={`/twotts/${props.id}`}>EDIT</Button>
             )}
 
-            {auth.isLoggedIn && (
+            {auth.userId === props.creatorId && (
               <Button danger onClick={showDeleteWarningHandler}>
                 DELETE
               </Button>
