@@ -18,16 +18,40 @@ const Auth = () => {
   const auth = useContext(AuthContext);
   const [isLoginMode, setIsLoginMode] = useState(true);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
-  const [formState, inputHandler, setFormData] = useForm({
-    email: {
-      value: "",
-      isValid: false,
+  const [formState, inputHandler, setFormData] = useForm(
+    {
+      email: {
+        value: "",
+        isValid: false,
+      },
+      password: {
+        value: "",
+        isValid: false,
+      },
     },
-    password: {
-      value: "",
-      isValid: false,
-    },
-  });
+    false
+  );
+
+  const switchModeHandler = () => {
+    if (!isLoginMode) {
+      setFormData(
+        { ...formState.inputs, name: undefined },
+        formState.inputs.email.isValid && formState.inputs.password.isValid
+      );
+    } else {
+      setFormData(
+        {
+          ...formState.inputs,
+          name: {
+            value: "",
+            isValid: false,
+          },
+        },
+        false
+      );
+    }
+    setIsLoginMode((prevMode) => !prevMode);
+  };
 
   const authSubmitHandler = async (event) => {
     event.preventDefault();
@@ -64,27 +88,6 @@ const Auth = () => {
         auth.login(responseData.userId, responseData.token);
       } catch (err) {}
     }
-  };
-
-  const switchModeHandler = () => {
-    if (!isLoginMode) {
-      setFormData(
-        { ...formState.inputs, name: undefined },
-        formState.inputs.email.isValid && formState.inputs.password.isValid
-      );
-    } else {
-      setFormData(
-        {
-          ...formState.inputs,
-          name: {
-            value: "",
-            isValid: false,
-          },
-        },
-        false
-      );
-    }
-    setIsLoginMode((prevMode) => !prevMode);
   };
 
   return (
