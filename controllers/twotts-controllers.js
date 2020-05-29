@@ -124,6 +124,11 @@ const updateTwott = async (req, res, next) => {
     return next(error);
   }
 
+  if (twott.creator.toString() !== req.userData.userId) {
+    const error = new HttpError("You are not allowed to edit this twott", 401);
+    return next(error);
+  }
+
   twott.title = title;
   twott.description = description;
 
@@ -155,6 +160,14 @@ const deleteTwott = async (req, res, next) => {
 
   if (!twott) {
     const error = new HttpError("Could not find twott for this id", 404);
+    return next(error);
+  }
+
+  if (twott.creator.id !== req.userData.userId) {
+    const error = new HttpError(
+      "You are not allowed to delete this twott",
+      401
+    );
     return next(error);
   }
 
