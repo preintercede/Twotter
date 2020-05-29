@@ -70,7 +70,7 @@ const NewTwott = () => {
           id="description"
           element="textarea"
           type="description"
-          label="Title"
+          label="Description"
           validators={[VALIDATOR_MINLENGTH(1)]}
           errorText="Please enter a description"
           onInput={inputHandler}
