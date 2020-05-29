@@ -15,9 +15,7 @@ const UserTwotts = () => {
   useEffect(() => {
     const fetchTwotts = async () => {
       try {
-        const responseData = await sendRequest(
-          `http://localhost:3001/api/twotts/user/${userId}`
-        );
+        const responseData = await sendRequest(`/api/twotts/user/${userId}`);
         setLoadedTwotts(responseData.twotts);
       } catch (err) {}
     };

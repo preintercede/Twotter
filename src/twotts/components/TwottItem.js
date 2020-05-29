@@ -24,12 +24,9 @@ const TwottItem = (props) => {
   const confirmDeleteHandler = async () => {
     setShowConfirmModal(false);
     try {
-      await sendRequest(
-        `http://localhost:3001/api/twotts/${props.id}`,
-        "DELETE",
-        null,
-        { Authorization: "Bearer " + auth.token }
-      );
+      await sendRequest(`/api/twotts/${props.id}`, "DELETE", null, {
+        Authorization: "Bearer " + auth.token,
+      });
       props.onDelete(props.id);
     } catch (err) {}
   };

@@ -38,9 +38,7 @@ const UpdateTwott = (props) => {
   useEffect(() => {
     const fetchTwott = async () => {
       try {
-        const responseData = await sendRequest(
-          `http://localhost:3001/api/twotts/${twottId}`
-        );
+        const responseData = await sendRequest(`/api/twotts/${twottId}`);
         setLoadedTwott(responseData.twott);
         setFormData(
           {
@@ -64,7 +62,7 @@ const UpdateTwott = (props) => {
     event.preventDefault();
     try {
       await sendRequest(
-        `http://localhost:3001/api/twotts/${twottId}`,
+        `/api/twotts/${twottId}`,
         "PUT",
         JSON.stringify({
           title: formState.inputs.title.value,

@@ -36,7 +36,7 @@ const NewTwott = () => {
     event.preventDefault();
     try {
       await sendRequest(
-        "http://localhost:3001/api/twotts",
+        `/api/twotts`,
         "POST",
         JSON.stringify({
           title: formState.inputs.title.value,
