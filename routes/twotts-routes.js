@@ -1,12 +1,15 @@
 const express = require("express");
 const { check } = require("express-validator");
 const twottsControllers = require("../controllers/twotts-controllers");
+const checkAuth = require("../middleware/check-auth");
 
 const router = express.Router();
 
 router.get("/:tid", twottsControllers.getTwottById);
 
 router.get("/user/:uid", twottsControllers.getTwottsByUserId);
+
+router.use(checkAuth);
 
 router.post(
   "/",

@@ -34,17 +34,15 @@ const NewTwott = () => {
 
   const twottSubmitHandler = async (event) => {
     event.preventDefault();
+
     try {
-      await sendRequest(
-        "http://localhost:3001/api/twotts",
-        "POST",
-        JSON.stringify({
-          title: formState.inputs.title.value,
-          description: formState.inputs.description.value,
-          creator: auth.userId,
-        }),
-        { "Content-Type": "application/json" }
-      );
+      const formData = new FormData();
+      formData.append("title", formState.inputs.title.value);
+      formData.append("description", formState.inputs.description.value);
+      formData.append("creator", auth.userId);
+      await sendRequest("http://localhost:3001/api/twotts", "POST", formData, {
+        Authorization: "Bearer " + auth.token,
+      });
       history.push("/");
     } catch (err) {}
   };
