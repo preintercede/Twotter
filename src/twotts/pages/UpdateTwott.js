@@ -72,6 +72,7 @@ const UpdateTwott = (props) => {
         }),
         {
           "Content-Type": "application/json",
+          Authorization: "Bearer " + auth.token,
         }
       );
       history.push("/" + auth.userId + "/twotts");
